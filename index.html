@@ -3,128 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Archify.io - Professional Architecture Services</title>
-    <meta name="description" content="Archify.io provides professional architecture services and solutions for modern businesses.">
-    <meta name="keywords" content="architecture, design, professional services, Archify">
+    <title>Archify.io - Modern Architecture Services</title>
+    <meta name="description" content="Archify.io offers modern and innovative architecture services for residential and commercial projects.">
+    <meta name="keywords" content="architecture, modern design, residential, commercial, building, construction, Archify.io">
     <meta name="author" content="Archify.io">
-    
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Archify.io - Professional Architecture Services">
-    <meta property="og:description" content="Professional architecture services and solutions for modern businesses.">
+
+    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://archify.io">
+    <meta property="og:url" content="https://archify.io/">
+    <meta property="og:title" content="Archify.io - Modern Architecture Services">
+    <meta property="og:description" content="Archify.io offers modern and innovative architecture services for residential and commercial projects.">
     <meta property="og:image" content="https://archify.io/logo_v3.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://archify.io/">
+    <meta property="twitter:title" content="Archify.io - Modern Architecture Services">
+    <meta property="twitter:description" content="Archify.io offers modern and innovative architecture services for residential and commercial projects.">
+    <meta property="twitter:image" content="https://archify.io/logo_v3.png">
+
+    <link rel="icon" href="logo_v3.png" type="image/png">
     
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Archify.io - Professional Architecture Services">
-    <meta name="twitter:description" content="Professional architecture services and solutions for modern businesses.">
-    <meta name="twitter:image" content="https://archify.io/logo_v3.png">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/729d9cb1a_logo.png">
-    
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="/vendors.77bf307e.css">
-    <link rel="stylesheet" href="/main.3c9f0674.css">
-    
-    <!-- Preconnect to external domains -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    
-    <!-- Cloudflare Turnstile -->
-    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
-    
-    <script>
-        // Comprehensive Base44 API blocking
-        (function() {
-            'use strict';
-            
-            // Block fetch API calls to Base44
-            if (window.fetch) {
-                const originalFetch = window.fetch;
-                window.fetch = function(url, options) {
-                    if (typeof url === 'string' && (url.includes('base44') || url.includes('app.base44.com'))) {
-                        console.log('Blocked Base44 fetch call:', url);
-                        return Promise.reject(new Error('Base44 API blocked'));
-                    }
-                    return originalFetch.call(this, url, options);
-                };
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        .header {
+            background: #fff;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #3498db;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+        }
+
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            font-weight: 700;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: 600;
+            transition: background 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: #c0392b;
+        }
+
+        /* Services Section */
+        .services {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+        }
+
+        /* About Section */
+        .about {
+            padding: 80px 0;
+            background: white;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .about-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .about-text p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 80px 0;
+            background: #2c3e50;
+            color: white;
+        }
+
+        .contact-content {
+            text-align: center;
+        }
+
+        .contact h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+        .contact-info {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-top: 2rem;
+        }
+
+        .contact-item {
+            text-align: center;
+        }
+
+        .contact-item h4 {
+            margin-bottom: 0.5rem;
+            color: #3498db;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1a252f;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
             }
-            
-            // Block XMLHttpRequest calls to Base44
-            const originalXHR = window.XMLHttpRequest;
-            window.XMLHttpRequest = function() {
-                const xhr = new originalXHR();
-                const originalOpen = xhr.open;
-                xhr.open = function(method, url, async, user, password) {
-                    if (typeof url === 'string' && (url.includes('base44') || url.includes('app.base44.com'))) {
-                        console.log('Blocked Base44 XHR call:', url);
-                        throw new Error('Base44 API blocked');
-                    }
-                    return originalOpen.call(this, method, url, async, user, password);
-                };
-                return xhr;
-            };
-            
-            // Block WebSocket connections to Base44
-            const originalWebSocket = window.WebSocket;
-            window.WebSocket = function(url, protocols) {
-                if (typeof url === 'string' && (url.includes('base44') || url.includes('app.base44.com'))) {
-                    console.log('Blocked Base44 WebSocket:', url);
-                    throw new Error('Base44 WebSocket blocked');
-                }
-                return new originalWebSocket(url, protocols);
-            };
-            
-            // Override any potential Base44 configuration
-            window.base44 = {
-                config: {},
-                api: function() { return Promise.reject(new Error('Base44 API disabled')); },
-                connect: function() { return Promise.reject(new Error('Base44 connection disabled')); }
-            };
-            
-            // Block any attempts to set Base44 URLs
-            Object.defineProperty(window, 'base44Url', {
-                get: function() { return null; },
-                set: function() { console.log('Base44 URL blocked'); }
-            });
-            
-        })();
-        
-        // Additional protection after DOM loads
-        document.addEventListener('DOMContentLoaded', function() {
-            // Block any remaining Base44 calls
-            const observer = new MutationObserver(function(mutations) {
-                mutations.forEach(function(mutation) {
-                    if (mutation.type === 'childList') {
-                        mutation.addedNodes.forEach(function(node) {
-                            if (node.nodeType === 1) { // Element node
-                                const scripts = node.querySelectorAll ? node.querySelectorAll('script') : [];
-                                scripts.forEach(function(script) {
-                                    if (script.src && script.src.includes('base44')) {
-                                        script.remove();
-                                        console.log('Removed Base44 script:', script.src);
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            });
-            
-            observer.observe(document.body, {
-                childList: true,
-                subtree: true
-            });
-        });
-    </script>
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero p {
+                font-size: 1.1rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .contact-info {
+                flex-direction: column;
+                gap: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <div id="root"></div>
-    
-    <!-- JavaScript Files -->
-    <script src="/vendors.b9747405.js"></script>
-    <script src="/main.59b37eb7.js"></script>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav container">
+            <a href="#" class="logo">Archify.io</a>
+            <ul class="nav-links">
+                <li><a href="#home">Home</a></li>
+                <li><a href="#services">Services</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="#contact">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="container">
+            <h1>Modern Architecture Services</h1>
+            <p>Transform your vision into reality with our innovative architectural solutions</p>
+            <a href="#contact" class="cta-button">Get Started</a>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">Our Services</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">🏠</div>
+                    <h3>Residential Design</h3>
+                    <p>Custom home designs that reflect your lifestyle and preferences. From modern minimalism to traditional elegance.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🏢</div>
+                    <h3>Commercial Projects</h3>
+                    <p>Innovative commercial spaces that enhance productivity and create lasting impressions for your business.</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🔧</div>
+                    <h3>Renovation & Remodeling</h3>
+                    <p>Transform existing spaces with our expert renovation services, maximizing both functionality and aesthetics.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about">
+        <div class="container">
+            <div class="about-content">
+                <div class="about-text">
+                    <h2>About Archify.io</h2>
+                    <p>We are passionate architects dedicated to creating spaces that inspire and function beautifully. With years of experience in residential and commercial design, we bring your vision to life.</p>
+                    <p>Our team combines creativity with technical expertise to deliver projects that exceed expectations while staying within budget and timeline.</p>
+                    <p>From concept to completion, we guide you through every step of the architectural process, ensuring your project reflects your unique style and meets your specific needs.</p>
+                </div>
+                <div class="about-image">
+                    <img src="logo_v3.png" alt="Archify.io Logo" style="width: 100%; max-width: 400px; border-radius: 10px;">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <div class="contact-content">
+                <h2>Get In Touch</h2>
+                <p>Ready to start your next architectural project? Contact us today for a consultation.</p>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <h4>Email</h4>
+                        <p>info@archify.io</p>
+                    </div>
+                    <div class="contact-item">
+                        <h4>Phone</h4>
+                        <p>+1 (555) 123-4567</p>
+                    </div>
+                    <div class="contact-item">
+                        <h4>Address</h4>
+                        <p>123 Architecture Ave<br>Design City, DC 12345</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Archify.io. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Add scroll effect to header
+        window.addEventListener('scroll', function() {
+            const header = document.querySelector('.header');
+            if (window.scrollY > 100) {
+                header.style.background = 'rgba(255, 255, 255, 0.95)';
+                header.style.backdropFilter = 'blur(10px)';
+            } else {
+                header.style.background = '#fff';
+                header.style.backdropFilter = 'none';
+            }
+        });
+    </script>
 </body>
 </html>
