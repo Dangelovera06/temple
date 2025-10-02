@@ -35,148 +35,44 @@
     <!-- Cloudflare Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     
-    <style>
-        /* Additional styles for standalone operation */
-        body {
-            font-family: 'WixMadeforText', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 2rem;
-            text-align: center;
-            color: white;
-        }
-        
-        .logo {
-            max-width: 200px;
-            margin-bottom: 2rem;
-        }
-        
-        h1 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            font-weight: 700;
-        }
-        
-        .subtitle {
-            font-size: 1.5rem;
-            margin-bottom: 2rem;
-            opacity: 0.9;
-        }
-        
-        .description {
-            font-size: 1.2rem;
-            line-height: 1.6;
-            margin-bottom: 3rem;
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .features {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-        
-        .feature {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 2rem;
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .feature h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .contact {
-            margin-top: 3rem;
-            padding: 2rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .contact h2 {
-            font-size: 2rem;
-            margin-bottom: 1rem;
-        }
-        
-        .contact-info {
-            font-size: 1.1rem;
-            line-height: 1.6;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 1rem;
+    <script>
+        // Override Base44 API calls to prevent errors
+        window.addEventListener('DOMContentLoaded', function() {
+            // Override any Base44 API calls
+            if (window.fetch) {
+                const originalFetch = window.fetch;
+                window.fetch = function(url, options) {
+                    // Block Base44 API calls
+                    if (typeof url === 'string' && url.includes('base44')) {
+                        console.log('Blocked Base44 API call:', url);
+                        return Promise.reject(new Error('Base44 API call blocked'));
+                    }
+                    return originalFetch.call(this, url, options);
+                };
             }
             
-            h1 {
-                font-size: 2rem;
-            }
-            
-            .subtitle {
-                font-size: 1.2rem;
-            }
-            
-            .description {
-                font-size: 1rem;
-            }
-        }
-    </style>
+            // Override XMLHttpRequest to block Base44 calls
+            const originalXHR = window.XMLHttpRequest;
+            window.XMLHttpRequest = function() {
+                const xhr = new originalXHR();
+                const originalOpen = xhr.open;
+                xhr.open = function(method, url, async, user, password) {
+                    if (typeof url === 'string' && url.includes('base44')) {
+                        console.log('Blocked Base44 XHR call:', url);
+                        throw new Error('Base44 API call blocked');
+                    }
+                    return originalOpen.call(this, method, url, async, user, password);
+                };
+                return xhr;
+            };
+        });
+    </script>
 </head>
 <body>
-    <div class="container">
-        <img src="/logo_v3.png" alt="Archify.io Logo" class="logo">
-        
-        <h1>Archify.io</h1>
-        <p class="subtitle">Professional Architecture Services</p>
-        
-        <p class="description">
-            Welcome to Archify.io, your premier destination for professional architecture services. 
-            We specialize in creating innovative, sustainable, and functional architectural solutions 
-            that transform visions into reality.
-        </p>
-        
-        <div class="features">
-            <div class="feature">
-                <h3>🏗️ Design Excellence</h3>
-                <p>Our team of experienced architects delivers cutting-edge designs that combine aesthetic appeal with functional efficiency.</p>
-            </div>
-            
-            <div class="feature">
-                <h3>🌱 Sustainable Solutions</h3>
-                <p>We prioritize environmentally conscious design practices to create buildings that are both beautiful and sustainable.</p>
-            </div>
-            
-            <div class="feature">
-                <h3>⚡ Modern Technology</h3>
-                <p>Utilizing the latest architectural software and design tools to bring your projects to life with precision and innovation.</p>
-            </div>
-        </div>
-        
-        <div class="contact">
-            <h2>Get In Touch</h2>
-            <div class="contact-info">
-                <p><strong>Website:</strong> <a href="https://archify.io" style="color: #fff; text-decoration: underline;">archify.io</a></p>
-                <p><strong>Services:</strong> Architecture Design, Planning, Consultation, Project Management</p>
-                <p><strong>Specialization:</strong> Residential, Commercial, Industrial, and Institutional Projects</p>
-            </div>
-        </div>
-    </div>
+    <div id="root"></div>
     
-    <!-- Remove the problematic JavaScript files for now -->
-    <!-- <script src="/vendors.b9747405.js"></script> -->
-    <!-- <script src="/main.59b37eb7.js"></script> -->
+    <!-- JavaScript Files -->
+    <script src="/vendors.b9747405.js"></script>
+    <script src="/main.59b37eb7.js"></script>
 </body>
 </html>
