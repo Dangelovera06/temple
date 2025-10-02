@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archify.io - Professional Architecture Services</title>
+    <meta name="description" content="Archify.io provides professional architecture services and solutions for modern businesses.">
+    <meta name="keywords" content="architecture, design, professional services, Archify">
+    <meta name="author" content="Archify.io">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Archify.io - Professional Architecture Services">
+    <meta property="og:description" content="Professional architecture services and solutions for modern businesses.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://archify.io">
+    <meta property="og:image" content="https://archify.io/logo_v3.png">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Archify.io - Professional Architecture Services">
+    <meta name="twitter:description" content="Professional architecture services and solutions for modern businesses.">
+    <meta name="twitter:image" content="https://archify.io/logo_v3.png">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo_v3.png">
+    
+    <!-- CSS Files - Preserving Original Styling -->
+    <link rel="stylesheet" href="vendors.77bf307e.css">
+    <link rel="stylesheet" href="main.3c9f0674.css">
+    
+    <style>
+        /* Clean standalone styles - no external dependencies */
+        body {
+            margin: 0;
+            font-family: 'WixMadeforText', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+        }
+        
+        /* Loading state */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: 500;
+        }
+        
+        /* Main content container */
+        .main-content {
+            min-height: 100vh;
+            background: white;
+        }
+        
+        /* Hero section */
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 120px 0 80px;
+            text-align: center;
+        }
+        
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #e74c3c;
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+        
+        .cta-button:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+        
+        /* Services section */
+        .services-section {
+            padding: 80px 0;
+            background: #f8f9fa;
+        }
+        
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .service-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .service-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        
+        .service-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .service-card p {
+            color: #666;
+            line-height: 1.6;
+        }
+        
+        /* About section */
+        .about-section {
+            padding: 80px 0;
+            background: white;
+        }
+        
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .about-text h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        
+        .about-text p {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: #666;
+            line-height: 1.7;
+        }
+        
+        .about-image {
+            text-align: center;
+        }
+        
+        .about-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Contact section */
+        .contact-section {
+            padding: 80px 0;
+            background: #2c3e50;
+            color: white;
+        }
+        
+        .contact-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .contact-content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+        
+        .contact-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            line-height: 1.6;
+        }
+        
+        .contact-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .contact-item {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+        }
+        
+        .contact-item h4 {
+            margin-bottom: 0.5rem;
+            color: #3498db;
+            font-weight: 600;
+        }
+        
+        .contact-item p {
+            margin: 0;
+            font-size: 1rem;
+        }
+        
+        /* Footer */
+        .footer {
+            background: #1a252f;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .about-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .contact-info {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <!-- Loading state -->
+        <div class="loading-container" id="loading">
+            <div>
+                <div class="loading-spinner"></div>
+                <div class="loading-text">Loading Archify.io...</div>
+            </div>
+        </div>
+        
+        <!-- Main content -->
+        <div class="main-content" id="mainContent" style="display: none;">
+            <!-- Hero Section -->
+            <section class="hero-section">
+                <div class="container">
+                    <h1 class="hero-title">Modern Architecture Services</h1>
+                    <p class="hero-subtitle">Transform your vision into reality with our innovative architectural solutions and professional design expertise.</p>
+                    <a href="#contact" class="cta-button">Get Started Today</a>
+                </div>
+            </section>
+
+            <!-- Services Section -->
+            <section class="services-section" id="services">
+                <h2 class="section-title">Our Services</h2>
+                <div class="services-grid">
+                    <div class="service-card">
+                        <span class="service-icon">🏠</span>
+                        <h3>Residential Design</h3>
+                        <p>Custom home designs that reflect your lifestyle and preferences. From modern minimalism to traditional elegance, we create spaces that feel like home.</p>
+                    </div>
+                    <div class="service-card">
+                        <span class="service-icon">🏢</span>
+                        <h3>Commercial Projects</h3>
+                        <p>Innovative commercial spaces that enhance productivity and create lasting impressions for your business. Functional design meets aesthetic appeal.</p>
+                    </div>
+                    <div class="service-card">
+                        <span class="service-icon">🔧</span>
+                        <h3>Renovation & Remodeling</h3>
+                        <p>Transform existing spaces with our expert renovation services, maximizing both functionality and aesthetics while respecting your budget.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section class="about-section" id="about">
+                <div class="about-content">
+                    <div class="about-text">
+                        <h2>About Archify.io</h2>
+                        <p>We are passionate architects dedicated to creating spaces that inspire and function beautifully. With years of experience in residential and commercial design, we bring your vision to life.</p>
+                        <p>Our team combines creativity with technical expertise to deliver projects that exceed expectations while staying within budget and timeline constraints.</p>
+                        <p>From concept to completion, we guide you through every step of the architectural process, ensuring your project reflects your unique style and meets your specific needs.</p>
+                    </div>
+                    <div class="about-image">
+                        <img src="logo_v3.png" alt="Archify.io Logo" />
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section class="contact-section" id="contact">
+                <div class="contact-content">
+                    <h2>Get In Touch</h2>
+                    <p>Ready to start your next architectural project? Contact us today for a consultation and let's bring your vision to life.</p>
+                    <div class="contact-info">
+                        <div class="contact-item">
+                            <h4>Email</h4>
+                            <p>info@archify.io</p>
+                        </div>
+                        <div class="contact-item">
+                            <h4>Phone</h4>
+                            <p>+1 (555) 123-4567</p>
+                        </div>
+                        <div class="contact-item">
+                            <h4>Address</h4>
+                            <p>123 Architecture Ave<br>Design City, DC 12345</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Footer -->
+            <footer class="footer">
+                <div class="container">
+                    <p>&copy; 2024 Archify.io. All rights reserved.</p>
+                </div>
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        // Clean standalone JavaScript - no external dependencies
+        document.addEventListener('DOMContentLoaded', function() {
+            // Simulate loading time to show the loading animation
+            setTimeout(function() {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+            }, 1500);
+            
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+            
+            // Add hover effects to service cards
+            const serviceCards = document.querySelectorAll('.service-card');
+            serviceCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-8px)';
+                });
+                
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>
