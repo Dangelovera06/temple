@@ -54,6 +54,9 @@ export default function TargetAudienceSection() {
           <h2 className="text-5xl md:text-6xl font-bold text-white mb-8 leading-tight">
             This System Works For:
           </h2>
+          <p className="text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
+            Whether you're building authority, scaling your business, or serving clients - this playbook is your shortcut to professional video content.
+          </p>
         </div>
 
         {/* Centered Grid of Bigger Cards */}
