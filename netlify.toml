@@ -1,13 +1,12 @@
 [build]
-  base = "Downloads/archify.io-f1af9fb4"
   command = "npm run build"
-  publish = "Downloads/archify.io-f1af9fb4/dist"
+  publish = "dist"
 
 [build.environment]
   NODE_VERSION = "18"
 
 [functions]
-  directory = "Downloads/archify.io-f1af9fb4/netlify/functions"
+  directory = "netlify/functions"
 
 # Redirect rules for SPA routing
 [[redirects]]
