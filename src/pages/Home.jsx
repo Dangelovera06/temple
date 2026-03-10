@@ -1,15 +1,13 @@
 import { Link } from 'react-router-dom'
 import { ScanLine, Leaf, BarChart3, ShieldCheck } from 'lucide-react'
+import logo from '../assets/logo.png'
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-green-50 to-white pb-24">
       {/* Header */}
       <div className="pt-14 pb-8 px-6 text-center">
-        <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
-          <Leaf size={12} />
-          Know what you eat
-        </div>
+        <img src={logo} alt="Temple" className="w-20 h-20 mx-auto mb-4 object-contain" />
         <h1 className="text-3xl font-black text-gray-900 leading-tight mb-3">
           Scan. Analyze.<br />
           <span className="text-green-600">Eat Better.</span>
