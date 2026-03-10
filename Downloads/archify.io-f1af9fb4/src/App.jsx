@@ -1,14 +1,26 @@
-import './App.css'
-import Pages from "@/pages/index.jsx"
-import { Toaster } from "@/components/ui/toaster"
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import Home from './pages/Home'
+import Scan from './pages/Scan'
+import ProductDetail from './pages/ProductDetail'
+import Tracker from './pages/Tracker'
+import History from './pages/History'
+import Auth from './pages/Auth'
+import BottomNav from './components/BottomNav'
 
-function App() {
+export default function App() {
   return (
-    <>
-      <Pages />
-      <Toaster />
-    </>
+    <BrowserRouter>
+      <div className="max-w-md mx-auto relative">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/scan" element={<Scan />} />
+          <Route path="/product/:barcode" element={<ProductDetail />} />
+          <Route path="/tracker" element={<Tracker />} />
+          <Route path="/history" element={<History />} />
+          <Route path="/auth" element={<Auth />} />
+        </Routes>
+        <BottomNav />
+      </div>
+    </BrowserRouter>
   )
 }
-
-export default App 

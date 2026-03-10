@@ -1,10 +1,13 @@
 [build]
-  # Since this is a static site, no build command needed
-  publish = "."
-  command = ""
+  base = "Downloads/archify.io-f1af9fb4"
+  command = "npm run build"
+  publish = "Downloads/archify.io-f1af9fb4/dist"
 
 [build.environment]
   NODE_VERSION = "18"
+
+[functions]
+  directory = "Downloads/archify.io-f1af9fb4/netlify/functions"
 
 # Redirect rules for SPA routing
 [[redirects]]
@@ -20,7 +23,7 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Permissions-Policy = "camera=self, microphone=(), geolocation=()"
 
 # Cache static assets
 [[headers]]
