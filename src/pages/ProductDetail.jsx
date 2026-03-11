@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Loader2, AlertCircle, Sparkles, CheckCircle2, XCircle } from 'lucide-react'
+import { ArrowLeft, Plus, Loader2, AlertCircle, Sparkles, CheckCircle2, XCircle, Target } from 'lucide-react'
 import { fetchProductByBarcode } from '../lib/openFoodFacts'
-import { analyzeIngredients } from '../lib/ingredientAnalysis'
+import { analyzeIngredients, getGoalInsights } from '../lib/ingredientAnalysis'
 import { analyzeWithClaude } from '../lib/claudeAPI'
 import { supabase } from '../lib/supabase'
 import HealthScore from '../components/HealthScore'
@@ -15,6 +15,7 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null)
   const [preAnalysis, setPreAnalysis] = useState(null)
   const [aiAnalysis, setAiAnalysis] = useState(null)
+  const [goalInsights, setGoalInsights] = useState([])
   const [loading, setLoading] = useState(true)
   const [aiLoading, setAiLoading] = useState(false)
   const [error, setError] = useState(null)
@@ -30,6 +31,13 @@ export default function ProductDetail() {
       setLoading(true)
       setError(null)
 
+      // Load user goals from metadata
+      let userGoals = []
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        userGoals = user.user_metadata?.goals || []
+      }
+
       // Check cache first — avoids re-using AI credits
       const { data: cached } = await supabase
         .from('scan_cache')
@@ -43,6 +51,12 @@ export default function ProductDetail() {
       const pre = analyzeIngredients(prod.ingredients_text)
       setPreAnalysis(pre)
 
+      // Compute goal insights locally (instant, no AI needed)
+      if (userGoals.length > 0) {
+        const insights = getGoalInsights(prod, pre.flagged, userGoals)
+        setGoalInsights(insights)
+      }
+
       // Write to scan_cache immediately so History shows this scan right away
       await supabase.from('scan_cache').upsert({
         barcode,
@@ -52,7 +66,6 @@ export default function ProductDetail() {
       })
 
       // Record this scan under the user's account (if logged in)
-      const { data: { user } } = await supabase.auth.getUser()
       if (user) {
         await supabase.from('user_scans').upsert({
           user_id: user.id,
@@ -66,7 +79,7 @@ export default function ProductDetail() {
       if (cached?.analysis) {
         setAiAnalysis(cached.analysis)
       } else {
-        runAIAnalysis(prod, pre)
+        runAIAnalysis(prod, pre, userGoals)
       }
     } catch (err) {
       setError(err.message)
@@ -75,14 +88,14 @@ export default function ProductDetail() {
     }
   }
 
-  async function runAIAnalysis(prod, pre) {
-    if (!prod.ingredients_text) return
+  async function runAIAnalysis(prod, pre, userGoals = []) {
     setAiLoading(true)
     try {
       const analysis = await analyzeWithClaude(
         prod.product_name || 'Unknown Product',
-        prod.ingredients_text,
-        pre
+        prod.ingredients_text || '',
+        pre,
+        userGoals
       )
       setAiAnalysis(analysis)
 
@@ -140,6 +153,7 @@ export default function ProductDetail() {
 
   const score = aiAnalysis?.health_score || preAnalysis?.score || 'unknown'
   const flagged = aiAnalysis?.flagged_ingredients || preAnalysis?.flagged || []
+  const summary = aiAnalysis?.summary || preAnalysis?.summary || null
 
   if (loading) {
     return (
@@ -199,42 +213,65 @@ export default function ProductDetail() {
           </div>
         </div>
 
-        {/* AI Loading */}
-        {aiLoading && (
-          <div className="rounded-2xl p-4 flex items-center gap-3 border border-blue-500/20"
-            style={{ background: 'rgba(59,130,246,0.08)' }}>
-            <Loader2 className="animate-spin text-blue-400 shrink-0" size={16} />
-            <div>
-              <p className="text-blue-300 text-sm font-semibold">AI analyzing ingredients...</p>
-              <p className="text-blue-400/60 text-xs">This takes about 5 seconds</p>
-            </div>
+        {/* Verdict / Summary — always shown */}
+        <div className="rounded-3xl p-4 border border-blue-500/15"
+          style={{ background: 'linear-gradient(135deg, rgba(29,78,216,0.2) 0%, rgba(99,102,241,0.1) 100%)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <Sparkles size={13} className="text-blue-400" />
+            <span className="text-blue-300 text-xs font-bold uppercase tracking-widest">
+              {aiAnalysis ? 'AI Verdict' : 'Quick Analysis'}
+            </span>
+            {aiLoading && <Loader2 size={11} className="animate-spin text-blue-400 ml-auto" />}
           </div>
-        )}
+          {summary ? (
+            <p className="text-white/80 text-sm leading-relaxed">{summary}</p>
+          ) : (
+            <p className="text-white/40 text-sm">
+              {product?.ingredients_text
+                ? 'Analyzing ingredients...'
+                : 'No ingredient data available for this product.'}
+            </p>
+          )}
+        </div>
 
-        {/* AI Summary */}
-        {aiAnalysis?.summary && (
-          <div className="rounded-3xl p-4 border border-blue-500/15"
-            style={{ background: 'linear-gradient(135deg, rgba(29,78,216,0.2) 0%, rgba(99,102,241,0.1) 100%)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={13} className="text-blue-400" />
-              <span className="text-blue-300 text-xs font-bold uppercase tracking-widest">AI Verdict</span>
+        {/* Goal Insights */}
+        {goalInsights.length > 0 && (
+          <div className="rounded-3xl p-4 border border-white/5" style={{ background: '#111827' }}>
+            <h2 className="font-bold text-white mb-3 text-sm flex items-center gap-2">
+              <Target size={14} className="text-blue-400" />
+              Your Goals
+            </h2>
+            <div className="space-y-2">
+              {goalInsights.map((insight, i) => (
+                <div key={i} className="flex items-start gap-2.5 py-1">
+                  <span className="text-base leading-none mt-0.5">{insight.icon}</span>
+                  <p className={`text-sm leading-snug ${insight.bad ? 'text-white/70' : 'text-emerald-400/90'}`}>
+                    {insight.text}
+                  </p>
+                </div>
+              ))}
             </div>
-            <p className="text-white/80 text-sm leading-relaxed">{aiAnalysis.summary}</p>
           </div>
         )}
 
         {/* Flagged Ingredients */}
-        {flagged.length > 0 && (
+        {flagged.length > 0 ? (
           <div className="rounded-3xl p-4 border border-white/5" style={{ background: '#111827' }}>
             <h2 className="font-bold text-white mb-3 flex items-center gap-2 text-sm">
-              <AlertCircle size={15} className="text-red-400" />
-              {flagged.length} Concerning Ingredient{flagged.length !== 1 ? 's' : ''}
+              <AlertCircle size={15} className="text-amber-400" />
+              {flagged.length} Ingredient{flagged.length !== 1 ? 's' : ''} Worth Noting
             </h2>
             <div className="space-y-2">
               {flagged.map((ing, i) => (
                 <IngredientFlag key={i} ingredient={ing} />
               ))}
             </div>
+          </div>
+        ) : preAnalysis && !aiLoading && (
+          <div className="rounded-2xl p-4 flex items-center gap-3 border border-emerald-500/15"
+            style={{ background: 'rgba(16,185,129,0.06)' }}>
+            <CheckCircle2 size={16} className="text-emerald-400 shrink-0" />
+            <p className="text-emerald-400 text-sm font-medium">No concerning ingredients detected</p>
           </div>
         )}
 
@@ -276,10 +313,15 @@ export default function ProductDetail() {
         <NutritionCard nutriments={product?.nutriments} />
 
         {/* Full Ingredients */}
-        {product?.ingredients_text && (
+        {product?.ingredients_text ? (
           <div className="rounded-3xl p-4 border border-white/5" style={{ background: '#111827' }}>
             <h2 className="font-bold text-white mb-2 text-sm">Full Ingredients</h2>
             <p className="text-white/30 text-xs leading-relaxed">{product.ingredients_text}</p>
+          </div>
+        ) : (
+          <div className="rounded-3xl p-4 border border-white/5" style={{ background: '#111827' }}>
+            <h2 className="font-bold text-white mb-2 text-sm">Full Ingredients</h2>
+            <p className="text-white/20 text-xs">No ingredient data available for this product in the Open Food Facts database.</p>
           </div>
         )}
       </div>

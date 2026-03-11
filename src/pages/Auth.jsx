@@ -4,6 +4,15 @@ import { supabase } from '../lib/supabase'
 import { Loader2, Mail, LogOut, ScanLine, Flame, User, Check, Edit2 } from 'lucide-react'
 import logo from '../assets/logo.png'
 
+const GOAL_OPTIONS = [
+  { id: 'avoid_seed_oils', label: 'Avoid Seed Oils', emoji: '🛢️' },
+  { id: 'low_sugar', label: 'Low Sugar', emoji: '🍬' },
+  { id: 'keto', label: 'Keto', emoji: '🥑' },
+  { id: 'high_protein', label: 'High Protein', emoji: '💪' },
+  { id: 'lose_weight', label: 'Lose Weight', emoji: '⚖️' },
+  { id: 'avoid_artificial', label: 'No Artificial Additives', emoji: '🚫' },
+]
+
 export default function Profile() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -18,6 +27,8 @@ export default function Profile() {
   const [nameInput, setNameInput] = useState('')
   const [savingName, setSavingName] = useState(false)
   const [stats, setStats] = useState({ scans: 0, logs: 0 })
+  const [goals, setGoals] = useState([])
+  const [savingGoals, setSavingGoals] = useState(false)
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -27,6 +38,7 @@ export default function Profile() {
         const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || ''
         setDisplayName(name)
         setNameInput(name)
+        setGoals(session.user.user_metadata?.goals || [])
         loadStats(session.user.id)
       }
       setLoading(false)
@@ -38,6 +50,7 @@ export default function Profile() {
         const name = session.user.user_metadata?.full_name || session.user.user_metadata?.name || ''
         setDisplayName(name)
         setNameInput(name)
+        setGoals(session.user.user_metadata?.goals || [])
         loadStats(session.user.id)
         setLoading(false)
       } else {
@@ -97,6 +110,16 @@ export default function Profile() {
       setEditingName(false)
     }
     setSavingName(false)
+  }
+
+  async function toggleGoal(goalId) {
+    const newGoals = goals.includes(goalId)
+      ? goals.filter(g => g !== goalId)
+      : [...goals, goalId]
+    setGoals(newGoals)
+    setSavingGoals(true)
+    await supabase.auth.updateUser({ data: { goals: newGoals } })
+    setSavingGoals(false)
   }
 
   async function handleSignOut() {
@@ -182,6 +205,34 @@ export default function Profile() {
                 </div>
                 <p className="text-white font-black text-2xl">{stats.logs}</p>
               </div>
+            </div>
+          </div>
+
+          {/* Health Goals */}
+          <div className="rounded-3xl p-4 border border-white/5" style={{ background: '#111827' }}>
+            <div className="flex items-center justify-between mb-3">
+              <p className="text-white font-bold text-sm">Health Goals</p>
+              {savingGoals && <Loader2 size={12} className="animate-spin text-blue-400" />}
+            </div>
+            <p className="text-white/30 text-xs mb-3">Tap to toggle. Scans will be personalized to your goals.</p>
+            <div className="flex flex-wrap gap-2">
+              {GOAL_OPTIONS.map(goal => {
+                const active = goals.includes(goal.id)
+                return (
+                  <button
+                    key={goal.id}
+                    onClick={() => toggleGoal(goal.id)}
+                    className="flex items-center gap-1.5 px-3 py-2 rounded-2xl text-xs font-semibold transition-all border"
+                    style={active
+                      ? { background: 'rgba(59,130,246,0.2)', borderColor: 'rgba(59,130,246,0.5)', color: '#93c5fd' }
+                      : { background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)', color: 'rgba(255,255,255,0.3)' }
+                    }
+                  >
+                    <span>{goal.emoji}</span>
+                    {goal.label}
+                  </button>
+                )
+              })}
             </div>
           </div>
 

@@ -7,30 +7,46 @@ export default async function handler(req) {
     return new Response('Method not allowed', { status: 405 })
   }
 
-  const { productName, ingredientsText, preAnalysis } = await req.json()
+  const { productName, ingredientsText, preAnalysis, userGoals = [] } = await req.json()
 
-  const prompt = `You are a food ingredient health expert. Analyze this product's ingredients and return ONLY valid JSON (no markdown, no explanation outside JSON).
+  const goalsContext = userGoals.length > 0
+    ? `\nUser's health goals: ${userGoals.join(', ')}. Tailor your summary and flagged ingredients to highlight what matters for these goals.`
+    : ''
+
+  const goalGuide = {
+    avoid_seed_oils: 'Flag any seed oils (canola, vegetable, soybean, sunflower, corn, cottonseed, safflower, grapeseed, rice bran) as high priority.',
+    low_sugar: 'Flag any added sugars, syrups, or sweeteners as high priority.',
+    keto: 'Note total carb content and flag any high-carb ingredients.',
+    high_protein: 'Highlight protein content and note if it is high or low.',
+    lose_weight: 'Note calorie density and flag high-calorie ingredients.',
+    avoid_artificial: 'Flag all artificial dyes, artificial flavors, preservatives, and artificial sweeteners as high priority.',
+  }
+  const goalNotes = userGoals.map(g => goalGuide[g]).filter(Boolean).join(' ')
+
+  const prompt = `You are a food ingredient health expert. Analyze this product and return ONLY valid JSON (no markdown, no explanation outside JSON).
 
 Product: ${productName}
-Ingredients: ${ingredientsText}
-Pre-flagged ingredients: ${JSON.stringify(preAnalysis.flagged.map(f => f.name))}
+Ingredients: ${ingredientsText || 'Not available'}
+Pre-flagged ingredients: ${JSON.stringify(preAnalysis.flagged.map(f => f.name))}${goalsContext}
+${goalNotes ? `\nGoal-specific focus: ${goalNotes}` : ''}
 
 Return this exact JSON structure:
 {
   "health_score": "A",
   "score_reason": "Brief reason for score",
   "flagged_ingredients": [
-    {"name": "ingredient name", "reason": "why it's bad", "severity": "high|medium|low"}
+    {"name": "ingredient name", "reason": "why it's concerning", "severity": "high|medium|low", "category": "Seed Oil|Preservative|Artificial Dye|Added Sugar|Artificial Sweetener|Refined Grain|Additive|Trans Fat|Artificial Flavor"}
   ],
   "good_aspects": ["positive thing 1", "positive thing 2"],
   "alternatives": [
     {"name": "Product Name or Category", "reason": "why it's better"}
   ],
-  "summary": "2-sentence plain English verdict for a health-conscious consumer."
+  "summary": "2-3 sentence plain English verdict. Be factual, not alarmist. List what's actually in it."
 }
 
-Health score guide: A=clean, B=mostly clean, C=some concerns, D=several harmful, E=very harmful.
-Be honest and direct. Focus on seed oils, artificial additives, preservatives, and sweeteners.`
+Health score guide: A=clean, B=mostly clean with minor concerns, C=some concerning ingredients, D=multiple harmful ingredients, E=very problematic.
+Be factual and direct. Use plain language — say "seed oil" not "toxic oil", say "artificial dye" not "dangerous chemical".
+If no ingredients are available, score based on product type and give a general note.`
 
   const message = await client.messages.create({
     model: 'claude-haiku-4-5-20251001',
