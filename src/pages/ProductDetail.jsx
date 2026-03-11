@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Loader2, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react'
+import { ArrowLeft, Plus, Loader2, AlertCircle, Sparkles, CheckCircle2, XCircle } from 'lucide-react'
 import { fetchProductByBarcode } from '../lib/openFoodFacts'
 import { analyzeIngredients } from '../lib/ingredientAnalysis'
 import { analyzeWithClaude } from '../lib/claudeAPI'
@@ -18,7 +18,8 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true)
   const [aiLoading, setAiLoading] = useState(false)
   const [error, setError] = useState(null)
-  const [added, setAdded] = useState(false)
+  const [trackerStatus, setTrackerStatus] = useState('idle') // idle | loading | success | error
+  const [trackerError, setTrackerError] = useState(null)
 
   useEffect(() => {
     loadProduct()
@@ -41,6 +42,16 @@ export default function ProductDetail() {
 
       const pre = analyzeIngredients(prod.ingredients_text)
       setPreAnalysis(pre)
+
+      // Write to scan_cache immediately so History shows this scan right away
+      if (!cached) {
+        await supabase.from('scan_cache').upsert({
+          barcode,
+          product_name: prod.product_name || 'Unknown Product',
+          health_score: pre.score || 'unknown',
+          analysis: null,
+        })
+      }
 
       if (cached?.analysis) {
         setAiAnalysis(cached.analysis)
@@ -65,7 +76,7 @@ export default function ProductDetail() {
       )
       setAiAnalysis(analysis)
 
-      // Cache so we never pay for this barcode again
+      // Update cache with full AI result
       await supabase.from('scan_cache').upsert({
         barcode,
         product_name: prod.product_name,
@@ -80,19 +91,41 @@ export default function ProductDetail() {
   }
 
   async function addToTracker() {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) { navigate('/auth'); return }
+    setTrackerStatus('loading')
+    setTrackerError(null)
 
-    const calories = Math.round(product?.nutriments?.['energy-kcal_100g'] || 0)
-    await supabase.from('calorie_logs').insert({
-      user_id: user.id,
-      date: new Date().toISOString().split('T')[0],
-      barcode,
-      product_name: product?.product_name || 'Unknown',
-      calories,
-      servings: 1,
-    })
-    setAdded(true)
+    try {
+      const { data: { user }, error: authErr } = await supabase.auth.getUser()
+
+      if (authErr || !user) {
+        navigate('/auth')
+        return
+      }
+
+      const calories = Math.round(product?.nutriments?.['energy-kcal_100g'] || 0)
+
+      const { error: insertErr } = await supabase.from('calorie_logs').insert({
+        user_id: user.id,
+        date: new Date().toISOString().split('T')[0],
+        barcode,
+        product_name: product?.product_name || 'Unknown',
+        calories,
+        servings: 1,
+      })
+
+      if (insertErr) {
+        console.error('Tracker insert error:', insertErr)
+        setTrackerError(insertErr.message)
+        setTrackerStatus('error')
+        return
+      }
+
+      setTrackerStatus('success')
+    } catch (err) {
+      console.error('Tracker error:', err)
+      setTrackerError(err.message)
+      setTrackerStatus('error')
+    }
   }
 
   const score = aiAnalysis?.health_score || preAnalysis?.score || 'unknown'
@@ -242,25 +275,38 @@ export default function ProductDetail() {
       </div>
 
       {/* Add to Tracker CTA */}
-      <div className="fixed bottom-20 left-0 right-0 px-4 z-40">
+      <div className="fixed bottom-20 left-0 right-0 px-4 z-40 space-y-2">
+        {/* Error message */}
+        {trackerStatus === 'error' && (
+          <div className="rounded-2xl p-3 flex items-center gap-2 border border-red-500/20"
+            style={{ background: 'rgba(239,68,68,0.1)' }}>
+            <XCircle size={14} className="text-red-400 shrink-0" />
+            <p className="text-red-300 text-xs leading-snug">
+              {trackerError?.includes('does not exist')
+                ? 'Database table missing — run the SQL setup in Supabase first.'
+                : trackerError || 'Failed to add to tracker. Are you signed in?'}
+            </p>
+          </div>
+        )}
+
         <button
           onClick={addToTracker}
-          disabled={added}
-          className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-2xl transition-all active:scale-98 ${
-            added ? 'text-white/30' : 'bg-blue-600 text-white'
+          disabled={trackerStatus === 'success' || trackerStatus === 'loading'}
+          className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-2xl transition-all ${
+            trackerStatus === 'success'
+              ? 'text-white/30'
+              : trackerStatus === 'loading'
+              ? 'bg-blue-600/50 text-white/50'
+              : 'bg-blue-600 text-white active:scale-98'
           }`}
-          style={added ? { background: '#111827', border: '1px solid rgba(255,255,255,0.08)' } : {}}
+          style={trackerStatus === 'success' ? { background: '#111827', border: '1px solid rgba(255,255,255,0.08)' } : {}}
         >
-          {added ? (
-            <>
-              <CheckCircle2 size={17} className="text-emerald-400" />
-              <span>Added to Tracker</span>
-            </>
+          {trackerStatus === 'loading' ? (
+            <><Loader2 size={17} className="animate-spin" /> Adding...</>
+          ) : trackerStatus === 'success' ? (
+            <><CheckCircle2 size={17} className="text-emerald-400" /> Added to Tracker</>
           ) : (
-            <>
-              <Plus size={17} />
-              Add to Daily Tracker
-            </>
+            <><Plus size={17} /> Add to Daily Tracker</>
           )}
         </button>
       </div>
