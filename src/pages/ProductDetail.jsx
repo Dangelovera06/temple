@@ -44,13 +44,23 @@ export default function ProductDetail() {
       setPreAnalysis(pre)
 
       // Write to scan_cache immediately so History shows this scan right away
-      if (!cached) {
-        await supabase.from('scan_cache').upsert({
+      await supabase.from('scan_cache').upsert({
+        barcode,
+        product_name: prod.product_name || 'Unknown Product',
+        health_score: cached?.health_score || pre.score || 'unknown',
+        analysis: cached?.analysis || null,
+      })
+
+      // Record this scan under the user's account (if logged in)
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        await supabase.from('user_scans').upsert({
+          user_id: user.id,
           barcode,
           product_name: prod.product_name || 'Unknown Product',
-          health_score: pre.score || 'unknown',
-          analysis: null,
-        })
+          health_score: cached?.health_score || pre.score || 'unknown',
+          scanned_at: new Date().toISOString(),
+        }, { onConflict: 'user_id,barcode' })
       }
 
       if (cached?.analysis) {
