@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Plus, Loader2, AlertCircle, Sparkles } from 'lucide-react'
+import { ArrowLeft, Plus, Loader2, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react'
 import { fetchProductByBarcode } from '../lib/openFoodFacts'
 import { analyzeIngredients } from '../lib/ingredientAnalysis'
 import { analyzeWithClaude } from '../lib/claudeAPI'
@@ -29,7 +29,7 @@ export default function ProductDetail() {
       setLoading(true)
       setError(null)
 
-      // Check cache first
+      // Check cache first — avoids re-using AI credits
       const { data: cached } = await supabase
         .from('scan_cache')
         .select('*')
@@ -45,7 +45,6 @@ export default function ProductDetail() {
       if (cached?.analysis) {
         setAiAnalysis(cached.analysis)
       } else {
-        // Run AI analysis in background
         runAIAnalysis(prod, pre)
       }
     } catch (err) {
@@ -66,7 +65,7 @@ export default function ProductDetail() {
       )
       setAiAnalysis(analysis)
 
-      // Cache the result
+      // Cache so we never pay for this barcode again
       await supabase.from('scan_cache').upsert({
         barcode,
         product_name: prod.product_name,
@@ -101,77 +100,91 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="animate-spin text-green-600" size={32} />
+      <div className="min-h-screen flex flex-col items-center justify-center gap-4" style={{ background: '#07070f' }}>
+        <div className="w-16 h-16 rounded-full border-2 border-blue-500/30 border-t-blue-500 animate-spin" />
+        <p className="text-white/40 text-sm">Loading product...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 gap-4">
-        <AlertCircle className="text-red-500" size={40} />
-        <p className="text-gray-700 text-center">{error}</p>
-        <button onClick={() => navigate('/scan')} className="text-green-600 font-semibold">
-          ← Try Again
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 gap-4" style={{ background: '#07070f' }}>
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+          style={{ background: 'rgba(239,68,68,0.12)' }}>
+          <AlertCircle className="text-red-400" size={28} />
+        </div>
+        <p className="text-white/60 text-center text-sm">{error}</p>
+        <button onClick={() => navigate('/scan')}
+          className="bg-blue-600 text-white font-bold px-6 py-3 rounded-2xl text-sm">
+          Try Again
         </button>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-28">
+    <div className="min-h-screen pb-32" style={{ background: '#07070f' }}>
       {/* Top bar */}
-      <div className="bg-white px-4 pt-14 pb-4 flex items-center gap-3 border-b border-gray-100">
-        <button onClick={() => navigate(-1)} className="p-2 -ml-2 text-gray-600">
-          <ArrowLeft size={20} />
+      <div className="px-4 pt-14 pb-4 flex items-center gap-3 border-b border-white/5"
+        style={{ background: '#07070f' }}>
+        <button onClick={() => navigate(-1)}
+          className="w-9 h-9 rounded-xl flex items-center justify-center border border-white/10"
+          style={{ background: '#111827' }}>
+          <ArrowLeft size={17} className="text-white" />
         </button>
-        <h1 className="font-bold text-gray-900 flex-1 truncate text-sm">
+        <h1 className="font-bold text-white flex-1 truncate text-sm">
           {product?.product_name || 'Product'}
         </h1>
         <HealthScore score={score} size="sm" />
       </div>
 
-      <div className="px-4 py-4 space-y-4">
-        {/* Product header */}
-        <div className="bg-white rounded-2xl p-4 flex gap-4 items-center shadow-sm border border-gray-50">
+      <div className="px-4 py-4 space-y-3">
+        {/* Product card */}
+        <div className="rounded-3xl p-4 flex gap-4 items-center border border-white/5"
+          style={{ background: '#111827' }}>
           {product?.image_url ? (
-            <img src={product.image_url} alt="" className="w-20 h-20 object-contain rounded-xl bg-gray-50 shrink-0" />
+            <img src={product.image_url} alt="" className="w-20 h-20 object-contain rounded-2xl shrink-0"
+              style={{ background: '#1f2937' }} />
           ) : (
-            <div className="w-20 h-20 bg-gray-100 rounded-xl shrink-0" />
+            <div className="w-20 h-20 rounded-2xl shrink-0" style={{ background: '#1f2937' }} />
           )}
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-gray-900">{product?.product_name}</p>
-            <p className="text-gray-500 text-sm">{product?.brands}</p>
-            <div className="mt-2">
-              <HealthScore score={score} size="md" />
-            </div>
+            <p className="font-bold text-white text-base leading-snug">{product?.product_name}</p>
+            <p className="text-white/40 text-xs mt-0.5 mb-3">{product?.brands}</p>
+            <HealthScore score={score} size="md" />
           </div>
         </div>
 
-        {/* AI Summary */}
+        {/* AI Loading */}
         {aiLoading && (
-          <div className="bg-purple-50 border border-purple-100 rounded-2xl p-4 flex items-center gap-3">
-            <Loader2 className="animate-spin text-purple-500 shrink-0" size={16} />
-            <p className="text-purple-700 text-sm">AI is analyzing ingredients...</p>
+          <div className="rounded-2xl p-4 flex items-center gap-3 border border-blue-500/20"
+            style={{ background: 'rgba(59,130,246,0.08)' }}>
+            <Loader2 className="animate-spin text-blue-400 shrink-0" size={16} />
+            <div>
+              <p className="text-blue-300 text-sm font-semibold">AI analyzing ingredients...</p>
+              <p className="text-blue-400/60 text-xs">This takes about 5 seconds</p>
+            </div>
           </div>
         )}
 
+        {/* AI Summary */}
         {aiAnalysis?.summary && (
-          <div className="bg-gradient-to-r from-purple-50 to-indigo-50 border border-purple-100 rounded-2xl p-4">
+          <div className="rounded-3xl p-4 border border-blue-500/15"
+            style={{ background: 'linear-gradient(135deg, rgba(29,78,216,0.2) 0%, rgba(99,102,241,0.1) 100%)' }}>
             <div className="flex items-center gap-2 mb-2">
-              <Sparkles size={14} className="text-purple-600" />
-              <span className="text-purple-700 text-xs font-bold uppercase tracking-wide">AI Verdict</span>
+              <Sparkles size={13} className="text-blue-400" />
+              <span className="text-blue-300 text-xs font-bold uppercase tracking-widest">AI Verdict</span>
             </div>
-            <p className="text-gray-800 text-sm leading-relaxed">{aiAnalysis.summary}</p>
+            <p className="text-white/80 text-sm leading-relaxed">{aiAnalysis.summary}</p>
           </div>
         )}
 
         {/* Flagged Ingredients */}
         {flagged.length > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-            <h2 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
-              <AlertCircle size={16} className="text-red-500" />
+          <div className="rounded-3xl p-4 border border-white/5" style={{ background: '#111827' }}>
+            <h2 className="font-bold text-white mb-3 flex items-center gap-2 text-sm">
+              <AlertCircle size={15} className="text-red-400" />
               {flagged.length} Concerning Ingredient{flagged.length !== 1 ? 's' : ''}
             </h2>
             <div className="space-y-2">
@@ -182,14 +195,18 @@ export default function ProductDetail() {
           </div>
         )}
 
-        {/* Good aspects */}
+        {/* Good Aspects */}
         {aiAnalysis?.good_aspects?.length > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-            <h2 className="font-bold text-gray-900 mb-3 text-green-700">✓ Good Aspects</h2>
-            <ul className="space-y-1">
+          <div className="rounded-3xl p-4 border border-emerald-500/15"
+            style={{ background: 'rgba(16,185,129,0.06)' }}>
+            <h2 className="font-bold text-emerald-400 mb-3 text-sm flex items-center gap-2">
+              <CheckCircle2 size={15} />
+              Good Aspects
+            </h2>
+            <ul className="space-y-1.5">
               {aiAnalysis.good_aspects.map((item, i) => (
-                <li key={i} className="text-sm text-gray-600 flex gap-2">
-                  <span className="text-green-500">•</span> {item}
+                <li key={i} className="text-sm text-white/60 flex gap-2">
+                  <span className="text-emerald-400 shrink-0">•</span> {item}
                 </li>
               ))}
             </ul>
@@ -198,13 +215,14 @@ export default function ProductDetail() {
 
         {/* Better Alternatives */}
         {aiAnalysis?.alternatives?.length > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-            <h2 className="font-bold text-gray-900 mb-3">Better Alternatives</h2>
+          <div className="rounded-3xl p-4 border border-white/5" style={{ background: '#111827' }}>
+            <h2 className="font-bold text-white mb-3 text-sm">Better Alternatives</h2>
             <div className="space-y-2">
               {aiAnalysis.alternatives.map((alt, i) => (
-                <div key={i} className="bg-green-50 rounded-xl p-3">
-                  <p className="font-semibold text-green-900 text-sm">{alt.name || alt}</p>
-                  {alt.reason && <p className="text-green-700 text-xs mt-0.5">{alt.reason}</p>}
+                <div key={i} className="rounded-2xl p-3 border border-blue-500/15"
+                  style={{ background: 'rgba(59,130,246,0.08)' }}>
+                  <p className="font-semibold text-blue-200 text-sm">{alt.name || alt}</p>
+                  {alt.reason && <p className="text-blue-400/70 text-xs mt-0.5">{alt.reason}</p>}
                 </div>
               ))}
             </div>
@@ -216,26 +234,34 @@ export default function ProductDetail() {
 
         {/* Full Ingredients */}
         {product?.ingredients_text && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm border border-gray-50">
-            <h2 className="font-bold text-gray-900 mb-2 text-sm">Full Ingredients</h2>
-            <p className="text-gray-500 text-xs leading-relaxed">{product.ingredients_text}</p>
+          <div className="rounded-3xl p-4 border border-white/5" style={{ background: '#111827' }}>
+            <h2 className="font-bold text-white mb-2 text-sm">Full Ingredients</h2>
+            <p className="text-white/30 text-xs leading-relaxed">{product.ingredients_text}</p>
           </div>
         )}
       </div>
 
       {/* Add to Tracker CTA */}
-      <div className="fixed bottom-20 left-0 right-0 px-4">
+      <div className="fixed bottom-20 left-0 right-0 px-4 z-40">
         <button
           onClick={addToTracker}
           disabled={added}
-          className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold shadow-lg transition-all ${
-            added
-              ? 'bg-gray-200 text-gray-500'
-              : 'bg-green-600 text-white shadow-green-200 active:bg-green-700'
+          className={`w-full flex items-center justify-center gap-2 py-4 rounded-2xl font-bold text-sm shadow-2xl transition-all active:scale-98 ${
+            added ? 'text-white/30' : 'bg-blue-600 text-white'
           }`}
+          style={added ? { background: '#111827', border: '1px solid rgba(255,255,255,0.08)' } : {}}
         >
-          <Plus size={18} />
-          {added ? 'Added to Tracker ✓' : 'Add to Daily Tracker'}
+          {added ? (
+            <>
+              <CheckCircle2 size={17} className="text-emerald-400" />
+              <span>Added to Tracker</span>
+            </>
+          ) : (
+            <>
+              <Plus size={17} />
+              Add to Daily Tracker
+            </>
+          )}
         </button>
       </div>
     </div>

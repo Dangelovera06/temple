@@ -1,25 +1,68 @@
 const severityConfig = {
-  high: { bg: 'bg-red-50', border: 'border-red-200', dot: 'bg-red-500', text: 'text-red-700', badge: 'bg-red-100 text-red-700' },
-  medium: { bg: 'bg-orange-50', border: 'border-orange-200', dot: 'bg-orange-400', text: 'text-orange-700', badge: 'bg-orange-100 text-orange-700' },
-  low: { bg: 'bg-yellow-50', border: 'border-yellow-200', dot: 'bg-yellow-400', text: 'text-yellow-700', badge: 'bg-yellow-100 text-yellow-700' },
+  high: {
+    bg: 'rgba(239,68,68,0.08)',
+    border: 'rgba(239,68,68,0.2)',
+    dot: '#ef4444',
+    name: '#fca5a5',
+    badge: { bg: 'rgba(239,68,68,0.15)', text: '#f87171' },
+    reason: 'rgba(239,68,68,0.7)',
+  },
+  medium: {
+    bg: 'rgba(249,115,22,0.08)',
+    border: 'rgba(249,115,22,0.2)',
+    dot: '#f97316',
+    name: '#fdba74',
+    badge: { bg: 'rgba(249,115,22,0.15)', text: '#fb923c' },
+    reason: 'rgba(249,115,22,0.7)',
+  },
+  low: {
+    bg: 'rgba(234,179,8,0.08)',
+    border: 'rgba(234,179,8,0.2)',
+    dot: '#eab308',
+    name: '#fde047',
+    badge: { bg: 'rgba(234,179,8,0.15)', text: '#facc15' },
+    reason: 'rgba(234,179,8,0.7)',
+  },
 }
 
 export default function IngredientFlag({ ingredient }) {
   const config = severityConfig[ingredient.severity] || severityConfig.low
 
   return (
-    <div className={`${config.bg} ${config.border} border rounded-xl p-3 flex gap-3 items-start`}>
-      <div className={`${config.dot} w-2.5 h-2.5 rounded-full mt-1 shrink-0`} />
-      <div className="flex-1 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="font-semibold text-gray-900 text-sm">{ingredient.name}</span>
+    <div style={{
+      background: config.bg,
+      border: `1px solid ${config.border}`,
+      borderRadius: 14,
+      padding: '10px 12px',
+      display: 'flex',
+      gap: 10,
+      alignItems: 'flex-start',
+    }}>
+      <div style={{
+        width: 8,
+        height: 8,
+        borderRadius: '50%',
+        background: config.dot,
+        marginTop: 4,
+        flexShrink: 0,
+      }} />
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{ fontWeight: 700, color: config.name, fontSize: 13 }}>{ingredient.name}</span>
           {ingredient.category && (
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${config.badge}`}>
+            <span style={{
+              fontSize: 10,
+              padding: '2px 7px',
+              borderRadius: 20,
+              fontWeight: 600,
+              background: config.badge.bg,
+              color: config.badge.text,
+            }}>
               {ingredient.category}
             </span>
           )}
         </div>
-        <p className={`text-xs mt-0.5 ${config.text}`}>{ingredient.reason}</p>
+        <p style={{ fontSize: 11, marginTop: 2, color: config.reason, lineHeight: 1.4 }}>{ingredient.reason}</p>
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Loader2, Clock } from 'lucide-react'
+import { Loader2, Clock, ScanLine, ChevronRight } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import HealthScore from '../components/HealthScore'
 
@@ -24,20 +24,31 @@ export default function History() {
   }
 
   if (loading) {
-    return <div className="min-h-screen flex items-center justify-center"><Loader2 className="animate-spin text-green-600" size={32} /></div>
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#07070f' }}>
+        <div className="w-10 h-10 rounded-full border-2 border-blue-500/30 border-t-blue-500 animate-spin" />
+      </div>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-28 pt-14">
-      <div className="px-4 py-4">
-        <h1 className="font-black text-2xl text-gray-900 mb-4">Scan History</h1>
+    <div className="min-h-screen pb-28 pt-14" style={{ background: '#07070f' }}>
+      <div className="px-5 py-4">
+        <div className="flex items-center justify-between mb-5">
+          <h1 className="font-black text-2xl text-white">Scan History</h1>
+          <span className="text-white/30 text-xs">{scans.length} scans</span>
+        </div>
 
         {scans.length === 0 ? (
           <div className="text-center py-16">
-            <Clock size={40} className="text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-400">No scans yet</p>
-            <button onClick={() => navigate('/scan')} className="mt-3 text-green-600 font-semibold text-sm">
-              Scan your first product →
+            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+              style={{ background: 'rgba(255,255,255,0.04)' }}>
+              <Clock size={24} className="text-white/20" />
+            </div>
+            <p className="text-white/30 text-sm mb-3">No scans yet</p>
+            <button onClick={() => navigate('/scan')}
+              className="bg-blue-600 text-white text-sm font-bold px-6 py-2.5 rounded-2xl">
+              Scan Your First Product
             </button>
           </div>
         ) : (
@@ -46,15 +57,18 @@ export default function History() {
               <button
                 key={scan.barcode}
                 onClick={() => navigate(`/product/${scan.barcode}`)}
-                className="w-full bg-white rounded-2xl p-4 flex items-center gap-4 shadow-sm border border-gray-50 text-left"
+                className="w-full rounded-2xl p-4 flex items-center gap-4 text-left border border-white/5 active:scale-98 transition-all"
+                style={{ background: '#111827' }}
               >
                 <HealthScore score={scan.health_score || 'unknown'} size="sm" />
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-gray-900 text-sm truncate">{scan.product_name || scan.barcode}</p>
-                  <p className="text-gray-400 text-xs mt-0.5">
-                    {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  <p className="font-semibold text-white text-sm truncate">{scan.product_name || scan.barcode}</p>
+                  <p className="text-white/30 text-xs mt-0.5 flex items-center gap-1">
+                    <Clock size={10} />
+                    {new Date(scan.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
                 </div>
+                <ChevronRight size={15} className="text-white/20 shrink-0" />
               </button>
             ))}
           </div>
